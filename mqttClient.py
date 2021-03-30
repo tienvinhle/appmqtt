@@ -59,11 +59,11 @@ mqttc.connect("113.161.79.146", 5000, 60)
 print("subscribe a topic")
 mqttc.subscribe("$SYS/iot2050No1/startstop", 0)
 
-mqttc.loop_start()
+mqttc.loop_forever()
 
-#print("tuple")
-#(rc, mid) = mqttc.publish("$SYS/iot2050No1/temperature", "30", qos=2)
-#print("class")
-#infot = mqttc.publish("$SYS/iot2050No1/humidity", "80", qos=2)
+print("temperature")
+(rc, mid) = mqttc.publish("$SYS/iot2050No1/temperature", "30", qos=2)
+print("humidity")
+infot = mqttc.publish("$SYS/iot2050No1/humidity", "80", qos=2)
 
-#infot.wait_for_publish()
+infot.wait_for_publish()
