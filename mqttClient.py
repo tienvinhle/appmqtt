@@ -1,26 +1,69 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# Copyright (c) 2010-2013 Roger Light <roger@atchoo.org>
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Distribution License v1.0
+# which accompanies this distribution.
+#
+# The Eclipse Distribution License is available at
+#   http://www.eclipse.org/org/documents/edl-v10.php.
+#
+# Contributors:
+#    Roger Light - initial implementation
+# Copyright (c) 2010,2011 Roger Light <roger@atchoo.org>
+# All rights reserved.
+
+# This shows a simple example of waiting for a message to be published.
+
+import context  # Ensures paho is in PYTHONPATH
 import paho.mqtt.client as mqtt
 
-# The callback for when the client receives a CONNACK response from the server.
-def on_connect(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
 
-    # Subscribing in on_connect() means that if we lose the connection and
-    # reconnect then subscriptions will be renewed.
-    client.subscribe("$SYS/#")
+def on_connect(mqttc, obj, flags, rc):
+    print("rc: " + str(rc))
 
-# The callback for when a PUBLISH message is received from the server.
-def on_message(client, userdata, msg):
-    print(msg.topic+" "+str(msg.payload))
 
-client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
+def on_message(mqttc, obj, msg):
+    print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
 
-client.username_pw_set("iot2021", password="iot2021")
-client.connect("113.161.79.146", 5000, 60)
 
-# Blocking call that processes network traffic, dispatches callbacks and
-# handles reconnecting.
-# Other loop*() functions are available that give a threaded interface and a
-# manual interface.
-client.loop_forever()
+def on_publish(mqttc, obj, mid):
+    print("mid: " + str(mid))
+    pass
+
+
+def on_subscribe(mqttc, obj, mid, granted_qos):
+    print("Subscribed: " + str(mid) + " " + str(granted_qos))
+
+
+def on_log(mqttc, obj, level, string):
+    print(string)
+
+
+# If you want to use a specific client id, use
+# mqttc = mqtt.Client("client-id")
+# but note that the client id must be unique on the broker. Leaving the client
+# id parameter empty will generate a random id for you.
+mqttc = mqtt.Client()
+mqttc.on_message = on_message
+mqttc.on_connect = on_connect
+mqttc.on_publish = on_publish
+mqttc.on_subscribe = on_subscribe
+# Uncomment to enable debug messages
+# mqttc.on_log = on_log
+mqttc.username_pw_set("iot2021", password="iot2021")
+mqttc.connect("113.161.79.146", 5000, 60)
+
+print("subscribe a topic")
+mqttc.subscribe("$SYS/iot2050No1/startstop", 0)
+
+mqttc.loop_start()
+
+print("tuple")
+(rc, mid) = mqttc.publish("$SYS/iot2050No1/temperature", "30", qos=2)
+print("class")
+infot = mqttc.publish("$SYS/iot2050No1/humidity", "80", qos=2)
+
+infot.wait_for_publish()
