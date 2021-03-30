@@ -25,7 +25,7 @@ def test_coro():
 def test_coro2():
     try:
         C = MQTTClient()
-        yield from C.connect('mqtt://113.161.79.146:5000/')
+        yield from C.connect('mqtt://iot2021:iot2021@113.161.79.146:5000/')
         yield from C.publish('$SYS/iot2050No1/temp', b'30', qos=0x00)
         yield from C.publish('$SYS/iot2050No1/humidity', b'80', qos=0x01)
         yield from C.publish('$SYS/iot2050No1/pressure', b'5', qos=0x02)
