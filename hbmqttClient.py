@@ -14,9 +14,7 @@ class HBMQTTClient():
         self.deviceID = deviceID
 
     async def connect(self, address, port, user, password):
-#        await self.mqttClient.connect('mqtt://'+user+':'+password+'@'+address+':'+str(port)+'/')
-        loop = asyncio.get_running_loop()
-        connected = asyncio.Event(loop=loop)
+        await self.mqttClient.connect('mqtt://'+user+':'+password+'@'+address+':'+str(port)+'/')
 
     async def disconnect(self):
         await self.mqttClient.disconnect()
