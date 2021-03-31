@@ -25,7 +25,7 @@ class HBMQTTClient():
         if object is not None:
             loop = asyncio.get_running_loop()
             for (key, value) in object['data'].items():
-                send_cmd = self.mqttClient.publish('$SYS/'+self.deviceID+'/'+key, value.encode('ascii'), qos=0x00)
+                send_cmd = self.mqttClient.publish('$SYS/'+self.deviceID+'/'+key, str(value).encode('ascii'), qos=0x00)
                 print('Task created key:{} value:{}', key, value)
                 loop.create_task(send_cmd.wait_for_publish())
 
