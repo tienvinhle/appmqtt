@@ -1,17 +1,22 @@
 import asyncio
 from queueHandler import Message
 import asyncio
-from hbmqtt.client import MQTTClient, ConnectException
-from hbmqtt.mqtt.constants import QOS_1, QOS_2
+#from hbmqtt.client import MQTTClient, ConnectException
+#from hbmqtt.mqtt.constants import QOS_1, QOS_2
+import aiomqtt
 import json
 
 class HBMQTTClient():
     def __init__(self, deviceID):
-        self.mqttClient = MQTTClient()
+        loop = asyncio.get_running_loop()
+#        self.mqttClient = MQTTClient()
+        self.mqttClient = aiomqtt.Client(loop)
         self.deviceID = deviceID
 
     async def connect(self, address, port, user, password):
-        await self.mqttClient.connect('mqtt://'+user+':'+password+'@'+address+':'+str(port)+'/')
+#        await self.mqttClient.connect('mqtt://'+user+':'+password+'@'+address+':'+str(port)+'/')
+        loop = asyncio.get_running_loop()
+        connected = asyncio.Event(loop=loop)
 
     async def disconnect(self):
         await self.mqttClient.disconnect()
@@ -20,7 +25,8 @@ class HBMQTTClient():
         if object is not None:
             loop = asyncio.get_running_loop()
             for (key, value) in object['data'].items():
-                loop.create_task(self.mqttClient.publish('$SYS/'+self.deviceID+'/'+key, value, qos=0x00))
+                send_cmd = self.mqttClient.publish('$SYS/'+self.deviceID+'/'+key, value, qos=0x00)
+                loop.create_task(send_cmd.wait_for_publish())
 
 
 #async def test_coro2():
