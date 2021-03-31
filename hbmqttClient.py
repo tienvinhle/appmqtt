@@ -18,9 +18,8 @@ class HBMQTTClient():
 
     def perform(self, object):
         if object is not None:
-            jsonObj = json.loads(object)
             loop = asyncio.get_running_loop()
-            for (key, value) in jsonObj.items():
+            for (key, value) in object['data'].items():
                 loop.create_task(self.mqttClient.publish('$SYS/'+self.deviceID+'/'+key, value, qos=0x00))
 
 
@@ -37,9 +36,10 @@ class HBMQTTClient():
 
 async def main():
     mqtt = HBMQTTClient('deviceNo1')
+    mqtt.connect('113.161.79.146', 5000, 'iot2021', 'iot2021')
     rd = Message('172.17.0.2', 6379)
     await rd.connect_to_redis()
-    rd.add_worker('mqtt', mqtt)
+    rd.add_worker('data', mqtt)
     await rd.add_channel('data')
 
 if __name__ == '__main__':
