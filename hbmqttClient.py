@@ -18,7 +18,7 @@ class HBMQTTClient():
 
     def perform(self, object):
         if object is not None:
-			jsonObj = json.loads(object)
+            jsonObj = json.loads(object)
             loop = asyncio.get_running_loop()
             for (key, value) in jsonObj.items():
                 loop.create_task(self.mqttClient.publish('$SYS/'+self.deviceID+'/'+key, value, qos=0x00))
