@@ -36,7 +36,7 @@ class HBMQTTClient():
 
 async def main():
     mqtt = HBMQTTClient('deviceNo1')
-    mqtt.connect('113.161.79.146', 5000, 'iot2021', 'iot2021')
+    await mqtt.connect('113.161.79.146', 5000, 'iot2021', 'iot2021')
     rd = Message('172.17.0.2', 6379)
     await rd.connect_to_redis()
     rd.add_worker('data', mqtt)
