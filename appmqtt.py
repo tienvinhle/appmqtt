@@ -2,7 +2,9 @@ import asyncio
 from queueHandler import Message
 import mqttClient
 
-client_id = 'deviceNo1'
+customer_id = 'customerNo1'
+device_id = 'deviceNo1'
+client_id = customer_id + '/' + device_id
 mqttServer = '113.161.79.146'
 mqttPort = 5000
 mqttUser = 'iot2021'

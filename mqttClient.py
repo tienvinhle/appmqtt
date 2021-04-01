@@ -92,5 +92,5 @@ class MQTTClient:
             if obj['type'] == 'mqtt':
                 if obj['function'] == 'publish':
                     for (datapoint, msg) in obj['para'].items():
-                        topic = '/' + self.clientID + '/' + datapoint
+                        topic = self.clientID + '/' + datapoint
                         self.publish_msg(topic, msg, self.qos)
