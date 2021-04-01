@@ -85,7 +85,7 @@ class MQTTClient:
         print('Set min and max delay value for reconnecting')
         self.client.reconnect_delay_set(self.min_delay, self.max_delay)
         print('Call reconnect')
-        self.client.reconnect()
+#        self.client.reconnect()
 
     def publish_msg(self, topic, message, QoS):
         encoded_msg = str(message).encode()
