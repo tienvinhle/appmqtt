@@ -87,6 +87,7 @@ class MQTTClient:
         self.client.publish(topic, encoded_msg, QoS)
 
     def perform(self, obj):
+        print('About to perform {}', obj)
         if obj['type'] is not None:
             if obj['type'] == 'mqtt':
                 if obj['function'] == 'publish':
