@@ -16,8 +16,8 @@ async def main():
     mqtt.connect('113.161.79.146', 5000, mqttKeepAlive)
     rd = Message('172.17.0.2', 6379)
     await rd.connect_to_redis()
-    rd.add_worker('data', mqtt)
-    await rd.add_channel('data')
+    rd.add_worker('mqtt', mqtt)
+    await rd.add_channel('mqtt')
 
 if __name__ == '__main__':
     asyncio.run(main())
