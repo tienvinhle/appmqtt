@@ -55,12 +55,14 @@ class MQTTClient:
         self.user = user
         self.password = password
         self.qos = qos
+        self.min_delay = 10
+        self.max_delay = 300
         self.client = mqtt.Client(client_id=clientID)
         self.client.username_pw_set(user, password)
         self.aioh = AsyncioHelper(self.loop, self.client)
         self.client.on_connect = self.on_connect
 #        self.client.on_message = self.on_message
-#        self.client.on_disconnect = self.on_disconnect
+        self.client.on_disconnect = self.on_disconnect
 
     def connect(self, host, port, keepalive):
         self.client.connect(host, port, keepalive)
@@ -79,15 +81,17 @@ class MQTTClient:
 #        else:
 #            self.got_message.set_result(msg.payload)
 
-#    def on_disconnect(self, client, userdata, rc):
-#        self.disconnected.set_result(rc)
+    def on_disconnect(self, client, userdata, rc):
+        print('Set min and max delay value for reconnecting')
+        self.client.reconnect_delay_set(self.min_delay, self.max_delay)
+        print('Call reconnect')
+        self.client.reconnect()
 
     def publish_msg(self, topic, message, QoS):
         encoded_msg = str(message).encode()
         self.client.publish(topic, encoded_msg, QoS)
 
     def perform(self, obj):
-        print('About to perform {}', obj)
         if obj['type'] is not None:
             if obj['type'] == 'mqtt':
                 if obj['function'] == 'publish':
