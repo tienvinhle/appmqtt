@@ -70,8 +70,8 @@ class MQTTClient:
         self.client.disconnect()
 
     def on_connect(self, client, userdata, flags, rc):
-        print("Subscribing")
-        self.client.subscribe(topic)
+        print("Connected to server")
+#        self.client.subscribe(topic)
 
 #    def on_message(self, client, userdata, msg):
 #        if not self.got_message:
