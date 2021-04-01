@@ -59,7 +59,7 @@ class MQTTClient:
         self.client.username_pw_set(user, password)
         self.aioh = AsyncioHelper(self.loop, self.client)
         self.client.on_connect = self.on_connect
-        self.client.on_message = self.on_message
+#        self.client.on_message = self.on_message
 #        self.client.on_disconnect = self.on_disconnect
 
     def connect(self, host, port, keepalive):
@@ -71,13 +71,13 @@ class MQTTClient:
 
     def on_connect(self, client, userdata, flags, rc):
         print("Subscribing")
-        client.subscribe(topic)
+        self.client.subscribe(topic)
 
-    def on_message(self, client, userdata, msg):
-        if not self.got_message:
-            print("Got unexpected message: {}".format(msg.decode()))
-        else:
-            self.got_message.set_result(msg.payload)
+#    def on_message(self, client, userdata, msg):
+#        if not self.got_message:
+#            print("Got unexpected message: {}".format(msg.decode()))
+#        else:
+#            self.got_message.set_result(msg.payload)
 
 #    def on_disconnect(self, client, userdata, rc):
 #        self.disconnected.set_result(rc)
