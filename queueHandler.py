@@ -20,13 +20,11 @@ class Message(object):
         self.redis = await aioredis.create_redis(conn)
 
     async def send_message(self, channel, message):
-        print('About to publish %s to channel %s', message, channel)
         await self.redis.publish(channel, message)
 
     async def add_channel(self, *channels):
         if len(channels)>0:
             for channel in channels:
-                print('About to add channel {}', channel)
                 res = await self.redis.subscribe(channel)
                 self.channels.append(res[0])
                 tsk = asyncio.ensure_future(self.callback_message_comes(res[0]))
