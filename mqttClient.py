@@ -1,69 +1,94 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-
-# Copyright (c) 2010-2013 Roger Light <roger@atchoo.org>
-#
-# All rights reserved. This program and the accompanying materials
-# are made available under the terms of the Eclipse Distribution License v1.0
-# which accompanies this distribution.
-#
-# The Eclipse Distribution License is available at
-#   http://www.eclipse.org/org/documents/edl-v10.php.
-#
-# Contributors:
-#    Roger Light - initial implementation
-# Copyright (c) 2010,2011 Roger Light <roger@atchoo.org>
-# All rights reserved.
-
-# This shows a simple example of waiting for a message to be published.
-
-#import context  # Ensures paho is in PYTHONPATH
+import socket
 import paho.mqtt.client as mqtt
+import asyncio
 
+class AsyncioHelper:
+    def __init__(self, loop, client):
+        self.loop = loop
+        self.client = client
+        self.client.on_socket_open = self.on_socket_open
+        self.client.on_socket_close = self.on_socket_close
+        self.client.on_socket_register_write = self.on_socket_register_write
+        self.client.on_socket_unregister_write = self.on_socket_unregister_write
 
-def on_connect(mqttc, obj, flags, rc):
-    print("rc: " + str(rc))
+    def on_socket_open(self, client, userdata, sock):
+        print("Socket opened")
 
+        def cb():
+            print("Socket is readable, calling loop_read")
+            client.loop_read()
 
-def on_message(mqttc, obj, msg):
-    print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
+        self.loop.add_reader(sock, cb)
+        self.misc = self.loop.create_task(self.misc_loop())
 
+    def on_socket_close(self, client, userdata, sock):
+        print("Socket closed")
+        self.loop.remove_reader(sock)
+        self.misc.cancel()
 
-def on_publish(mqttc, obj, mid):
-    print("mid: " + str(mid))
-    pass
+    def on_socket_register_write(self, client, userdata, sock):
+        print("Watching socket for writability.")
 
+        def cb():
+            print("Socket is writable, calling loop_write")
+            client.loop_write()
 
-def on_subscribe(mqttc, obj, mid, granted_qos):
-    print("Subscribed: " + str(mid) + " " + str(granted_qos))
+        self.loop.add_writer(sock, cb)
 
+    def on_socket_unregister_write(self, client, userdata, sock):
+        print("Stop watching socket for writability.")
+        self.loop.remove_writer(sock)
 
-def on_log(mqttc, obj, level, string):
-    print(string)
+    async def misc_loop(self):
+        print("misc_loop started")
+        while self.client.loop_misc() == mqtt.MQTT_ERR_SUCCESS:
+            try:
+                await asyncio.sleep(1)
+            except asyncio.CancelledError:
+                break
+        print("misc_loop finished")
 
+class MQTTClient:
+    def __init__(self, clientID, user, password, qos, loop):
+        self.clientID = clientID
+        self.loop = loop
+        self.user = user
+        self.password = password
+        self.qos = qos
+        self.client = mqtt.Client(client_id=clientID)
+        self.client.username_pw_set(user, password)
+        self.aioh = AsyncioHelper(self.loop, self.client)
+        self.client.on_connect = self.on_connect
+        self.client.on_message = self.on_message
+        self.client.on_disconnect = self.on_disconnect
 
-# If you want to use a specific client id, use
-# mqttc = mqtt.Client("client-id")
-# but note that the client id must be unique on the broker. Leaving the client
-# id parameter empty will generate a random id for you.
-mqttc = mqtt.Client()
-mqttc.on_message = on_message
-mqttc.on_connect = on_connect
-mqttc.on_publish = on_publish
-mqttc.on_subscribe = on_subscribe
-# Uncomment to enable debug messages
-# mqttc.on_log = on_log
-mqttc.username_pw_set("iot2021", password="iot2021")
-mqttc.connect("113.161.79.146", 5000, 60)
+    def connect(self, host, port, keepalive):
+        self.client.connect(host, port, keepalive)
+        self.client.socket().setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 2048)
 
-print("subscribe a topic")
-mqttc.subscribe("$SYS/iot2050No1/startstop", 0)
+    def disconnect(self):
+        self.client.disconnect()
 
-mqttc.loop_forever()
+    def on_connect(self, client, userdata, flags, rc):
+        print("Subscribing")
+        client.subscribe(topic)
 
-print("temperature")
-(rc, mid) = mqttc.publish("$SYS/iot2050No1/temperature", "30", qos=2)
-print("humidity")
-infot = mqttc.publish("$SYS/iot2050No1/humidity", "80", qos=2)
+    def on_message(self, client, userdata, msg):
+        if not self.got_message:
+            print("Got unexpected message: {}".format(msg.decode()))
+        else:
+            self.got_message.set_result(msg.payload)
 
-infot.wait_for_publish()
+    def on_disconnect(self, client, userdata, rc):
+#        self.disconnected.set_result(rc)
+
+    def publish_msg(self, topic, message, QoS):
+        encoded_msg = str(message).encode()
+        self.client.publish(topic, encoded_msg, QoS)
+
+    def perform(self, obj):
+        if obj['type'] is not None:
+            if obj['type'] == 'mqtt':
+                if obj['function'] == 'publish':
+                    for (topic, msg) in obj['para'].items():
+                        self.publish_msg(topic, msg, self.qos)
