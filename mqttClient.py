@@ -91,4 +91,5 @@ class MQTTClient:
             if obj['type'] == 'mqtt':
                 if obj['function'] == 'publish':
                     for (topic, msg) in obj['para'].items():
+                        print('About to publish topic {} value {}', topic, msg)
                         self.publish_msg(topic, msg, self.qos)
