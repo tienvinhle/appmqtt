@@ -26,6 +26,7 @@ class Message(object):
     async def add_channel(self, *channels):
         if len(channels)>0:
             for channel in channels:
+                print('About to add channel {}', channel)
                 res = await self.redis.subscribe(channel)
                 self.channels.append(res[0])
                 tsk = asyncio.ensure_future(self.callback_message_comes(res[0]))
