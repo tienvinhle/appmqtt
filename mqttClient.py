@@ -60,7 +60,7 @@ class MQTTClient:
         self.aioh = AsyncioHelper(self.loop, self.client)
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
-        self.client.on_disconnect = self.on_disconnect
+#        self.client.on_disconnect = self.on_disconnect
 
     def connect(self, host, port, keepalive):
         self.client.connect(host, port, keepalive)
@@ -79,7 +79,7 @@ class MQTTClient:
         else:
             self.got_message.set_result(msg.payload)
 
-    def on_disconnect(self, client, userdata, rc):
+#    def on_disconnect(self, client, userdata, rc):
 #        self.disconnected.set_result(rc)
 
     def publish_msg(self, topic, message, QoS):
