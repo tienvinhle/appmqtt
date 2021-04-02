@@ -84,7 +84,7 @@ class MQTTClient:
     def on_disconnect(self, client, userdata, rc):
         print('Set min and max delay value for reconnecting')
         self.client.reconnect_delay_set(self.min_delay, self.max_delay)
-        print('Call reconnect')
+        print('It is supposed to reconnect again automatically')
 #        self.client.reconnect()
 
     def publish_msg(self, topic, message, QoS):
