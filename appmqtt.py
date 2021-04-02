@@ -16,7 +16,7 @@ async def main():
 #    loop = asyncio.get_running_loop()
     mqtt = mqttClient.MQTTClient(client_id, mqttUser, mqttPassword, mqttQoS)
     mqtt.connect('113.161.79.146', 5000, mqttKeepAlive)
-    mqtt.loop_start()
+    mqtt.client.loop_start()
     rd = Message('172.17.0.2', 6379)
     await rd.connect_to_redis()
     rd.add_worker('mqtt', mqtt)
