@@ -25,13 +25,15 @@ class Message(object):
     async def add_channel(self, *channels):
         if len(channels)>0:
             for channel in channels:
+                tsk = None
                 if ('*' in channel):
                     res = await self.redis.subscribe(channel)
                     self.channels.append(res[0])
-                    asyncio.ensure_future(self.callback_message_comes(res[0]))
+                    tsk = asyncio.ensure_future(self.callback_message_comes(res[0]))
                 else:
                     pat = redis.psubscribe(channel)
                     tsk = asyncio.ensure_future(self.callback_message_comes(pat[0]))
+                await tsk
     
     async def callback_message_comes(self, channel):
         while (await channel.wait_message()):
