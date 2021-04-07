@@ -31,7 +31,7 @@ class Message(object):
                     self.channels.append(res[0])
                     tsk = asyncio.ensure_future(self.callback_message_comes(res[0]))
                 else:
-                    pat = redis.psubscribe(channel)
+                    pat = await self.redis.psubscribe(channel)
                     tsk = asyncio.ensure_future(self.callback_message_comes(pat[0]))
                 await tsk
     
