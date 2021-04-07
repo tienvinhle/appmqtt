@@ -25,6 +25,7 @@ class Message(object):
     async def add_channel(self, *channels):
         if len(channels)>0:
             for channel in channels:
+                tsk = None
                 if ('*' in channel):
                     res = await self.redis.subscribe(channel)
                     self.channels.append(res[0])
