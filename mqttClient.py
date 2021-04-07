@@ -70,7 +70,7 @@ class MQTTClient:
         self.client.disconnect()
 
     def on_connect(self, client, userdata, flags, rc):
-        print("Connected to server")
+        print("Connected to MQTT Broker")
 
     def on_disconnect(self, client, userdata, rc):
         print('Set min and max delay value for reconnecting')
