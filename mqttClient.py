@@ -79,10 +79,9 @@ class MQTTClient:
 
     def publish_msg(self, topic, message, QoS):
         encoded_msg = str(message).encode()
-        sendingTopic = self.orgID + topic.replace('data','')
         self.client.publish(topic, encoded_msg, QoS)
 
     def perform(self, obj):
         for (datapoint, msg) in obj.items():
-            topic = self.clientID + '/' + datapoint
+            topic = self.orgID + '/' + datapoint.replace('data','')
             self.publish_msg(topic, msg, self.qos)

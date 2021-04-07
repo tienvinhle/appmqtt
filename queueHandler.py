@@ -26,7 +26,7 @@ class Message(object):
         if len(channels)>0:
             for channel in channels:
                 tsk = None
-                if ('*' in channel):
+                if ('*' not in channel):
                     res = await self.redis.subscribe(channel)
                     self.channels.append(res[0])
                     tsk = asyncio.ensure_future(self.callback_message_comes(res[0]))
@@ -38,6 +38,7 @@ class Message(object):
     async def callback_message_comes(self, channel):
         while (await channel.wait_message()):
             msg = await channel.get_json()
-            print("Got Message:", msg)
-#            worker = self.workers.get(msg['type'], "nothing")
-            self.worker.perform(msg)
+            print("Got Message: from channel", msg, channel)
+            msgSend = dict()
+            msgSend[channel] = msg
+            self.worker.perform(msgSend)
