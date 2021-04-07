@@ -83,5 +83,5 @@ class MQTTClient:
 
     def perform(self, obj):
         for (datapoint, msg) in obj.items():
-            topic = self.orgID + datapoint.replace('data','')
+            topic = datapoint.replace('data/','')
             self.publish_msg(topic, msg, self.qos)
