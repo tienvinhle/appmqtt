@@ -38,7 +38,10 @@ class Message(object):
     async def callback_message_comes(self, channel):
         while (await channel.wait_message()):
             msg = await channel.get_json()
-            print("Got Message: from channel", msg, channel)
+            print("Got Message: from channel", msg)
             msgSend = dict()
-            msgSend[channel] = msg
+            if (type(msg) == list) | (type(msg) == tuple):
+                msgSend[msg[1]] = msg[2]
+            else:
+                msgSend[channel] = msg
             self.worker.perform(msgSend)
