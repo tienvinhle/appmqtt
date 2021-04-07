@@ -41,7 +41,9 @@ class Message(object):
             print("Got Message: from channel", msg)
             msgSend = dict()
             if (type(msg) == list) | (type(msg) == tuple):
-                msgSend[msg[1]] = msg[2]
+                print('Tuple or List')
+                msgSend[msg[1].name] = msg[2]
             else:
-                msgSend[channel] = msg
+                print('single object')
+                msgSend[channel.name] = msg
             self.worker.perform(msgSend)
