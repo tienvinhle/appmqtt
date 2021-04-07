@@ -42,8 +42,9 @@ class Message(object):
             msgSend = dict()
             if (type(msg) == list) | (type(msg) == tuple):
                 print('Tuple or List')
-                msgSend[msg[1].name] = msg[2]
+                msgSend[msg[1].name.decode()] = msg[2]
             else:
                 print('single object')
-                msgSend[channel.name] = msg
+                #decode to convert to string from binary b'
+                msgSend[channel.name.decode()] = msg
             self.worker.perform(msgSend)
