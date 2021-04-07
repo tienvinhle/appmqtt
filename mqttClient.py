@@ -79,7 +79,6 @@ class MQTTClient:
 
     def publish_msg(self, topic, message, QoS):
         encoded_msg = str(message).encode()
-        print()
         self.client.publish(topic, encoded_msg, QoS)
 
     def perform(self, obj):

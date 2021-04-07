@@ -42,7 +42,7 @@ class Message(object):
             msgSend = dict()
             if (type(msg) == list) | (type(msg) == tuple):
                 print('Tuple or List')
-                msgSend[msg[1].name.decode()] = msg[2]
+                msgSend[msg[0].decode()] = msg[1]
             else:
                 print('single object')
                 #decode to convert to string from binary b'
