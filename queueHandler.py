@@ -7,12 +7,12 @@ class Message(object):
     def __init__(self, redisHost, redisPort):
         self.redisHost = redisHost
         self.redisPort = redisPort
-        self.workers = dict()
+        self.worker = None
         self.redis = None
         self.channels = []
 
-    def add_worker(self, workName, workerInstance):
-        self.workers[workName] = workerInstance
+    def add_worker(self, workerInstance):
+        self.worker = workerInstance
 
     async def connect_to_redis(self):
         conn = 'redis://' + self.redisHost + ':' + str(self.redisPort)
@@ -34,5 +34,5 @@ class Message(object):
         while (await channel.wait_message()):
             msg = await channel.get_json()
             print("Got Message:", msg)
-            worker = self.workers.get(msg['type'], "nothing")
-            worker.perform(msg)
+#            worker = self.workers.get(msg['type'], "nothing")
+            self.worker.perform(msg)

@@ -92,9 +92,6 @@ class MQTTClient:
         self.client.publish(topic, encoded_msg, QoS)
 
     def perform(self, obj):
-        if obj['type'] is not None:
-            if obj['type'] == 'mqtt':
-                if obj['function'] == 'publish':
-                    for (datapoint, msg) in obj['para'].items():
-                        topic = self.clientID + '/' + datapoint
-                        self.publish_msg(topic, msg, self.qos)
+        for (datapoint, msg) in obj.items():
+            topic = self.clientID + '/' + datapoint
+            self.publish_msg(topic, msg, self.qos)

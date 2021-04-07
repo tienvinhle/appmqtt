@@ -19,7 +19,7 @@ async def main():
     mqtt.client.loop_start()
     rd = Message('172.17.0.2', 6379)
     await rd.connect_to_redis()
-    rd.add_worker('mqtt', mqtt)
+    rd.add_worker(mqtt)
     await rd.add_channel('mqtt')
 
 if __name__ == '__main__':
