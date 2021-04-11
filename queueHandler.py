@@ -37,12 +37,14 @@ class Message(object):
     
     async def callback_message_comes(self, channel):
         while (await channel.wait_message()):
-            msg = await channel.get_json()
+            #get() will return data as byte format according to aioredis docucment
+            msg = await channel.get()
+            #msg will be something like this (b'data/inverterB/workingHours', b'{"value": 12.5, "unit": "hours", "dataType": "float32", "timeStamp": "2021-04-11 15:28:21.469834"}')
             print("Got Message: from channel", msg)
             msgSend = dict()
             if (type(msg) == list) | (type(msg) == tuple):
                 print('Tuple or List')
-                msgSend[msg[0].decode()] = msg[1]
+                msgSend[msg[0].decode()] = msg[1].decode()
             else:
                 print('single object')
                 #decode to convert to string from binary b'

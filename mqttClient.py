@@ -78,7 +78,6 @@ class MQTTClient:
         print('It is supposed to reconnect again automatically')
 
     def publish_msg(self, topic, message, QoS):
-        encoded_msg = str(message).encode()
         self.client.publish(topic, encoded_msg, QoS)
 
     def perform(self, obj):
